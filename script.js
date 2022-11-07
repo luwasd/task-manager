@@ -1,197 +1,74 @@
-/*const AGREGAR_TAREA = document.getElementById('agregar-tarea');
-const VER_TAREAS = document.getElementById('ver-tareas');
-
-const FECHA_LIMITE = document.getElementById('fecha-limite');
-const OPCIONES_LISTA = document.getElementById('opciones-de-agregar');
-const DESCRIPCION = document.getElementById('descripcion');
-const SALIR_DE_AGREGAR = document.getElementById('salir-de-agregar');
-const AGREGAR_A_LISTA = document.getElementById('agregar-a-la-lista');
-
-const OPCIONES_LISTA_TAREAS = document.getElementById('opciones-lista-con-tareas');
-const SALIR_DE_VER_TAREAS = document.getElementById('salir-de-ver-tareas');
-
-const SHEET_ID = "1pGtv8U2P3AOv4Xrkmo_tPVDCzUxakuIl5FBfmy6dOas";
-
-
-
-AGREGAR_TAREA.addEventListener('click', () => {
-    document.getElementById('seccion-agregar').style.display = 'block';
-    document.getElementById('seccion-inicio').style.display = 'none';
-
-    const ACCESS_TOKEN = 'ya29.a0Aa4xrXNptgUnSas_HxwOe9k8u4PPSN4VDbOv9voD0E8ouUfB3HU3NHESsYF_OrnPD8o6iep0V2oimJHrlg3IwdH7WScuVVopNFXaCqEl5St2ODPdQV5X6pQ29d_a4bjWaN9iLzoCVLwz67jDNFmOk1Tv9s60aCgYKATASARISFQEjDvL9Ej2fk3p6Qi-j88sKN_QtGQ0163';
-
-    fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/doctores!A2:A`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${ACCESS_TOKEN}`,
-            },
-        }
-    ).then(function (response) {
-        response.json().then(function (data) {
-            const values = data.values;
-            for (var i = 0; i < values.length; i++) {
-                const SELECCION = document.createElement('option');
-                SELECCION.innerHTML = values[i][0];
-                OPCIONES_LISTA.appendChild(SELECCION);
-            }
-        })
-    })
-    AGREGAR_A_LISTA.addEventListener('click', () => {
-
-        const ACCESS_TOKEN2 = 'ya29.a0Aa4xrXPNfQQ9Jjb57HCvB2eclKHvaWDTu4wHiKwprAPYQiem-7oePRoymnbHqu3S9JMmGycnPA7wPJEjm1BQ5IhzQHJgLT2JapUpbeUunr1evJbvaxIeLOOm1OvifwLO0ppH8OM3D8VE9ExwgwfzHwcoZW8paCgYKATASARMSFQEjDvL9FE31inyu-Hta6r-Th7lNxw0163';
-
-        let data = {};
-        let values = [];
-        let fila = [FECHA_LIMITE, OPCIONES_LISTA, DESCRIPCION];
-
-        values.push(fila);
-        data.range = "tareas";
-        data.majorDimension = "ROWS";
-        data.values = values;
-        fetch(
-            `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/tareas:append?valueInputOption=USER_ENTERED`,
-            {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${ACCESS_TOKEN2}`,
-                },
-                body: JSON.stringify(data)
-            }
-        ).then(function (response) {
-            response.json().then(function (data) {
-
-            });
-        });
-
-    })
-    SALIR_DE_AGREGAR.addEventListener('click', () => {
-        document.getElementById('seccion-agregar').style.display = 'none';
-        document.getElementById('seccion-inicio').style.display = 'block';
-        OPCIONES_LISTA.innerHTML = '';
-    })
-
-})*/
-
 const FECHA_LIMITE = document.getElementById('fecha-limite');
 const DESCRIPCION = document.getElementById('descripcion');
 const AGREGAR = document.getElementById('agregar');
-const TAREAS = document.getElementById('tareas');
 const ERROR = document.getElementById('error');
+const TAREAS = document.getElementById('tareas');
 
+AGREGAR.addEventListener('click', agregarTarea);
 
+function agregarTarea(e) {
 
-const SHEET_ID = "1pGtv8U2P3AOv4Xrkmo_tPVDCzUxakuIl5FBfmy6dOas";
+    let fecha = FECHA_LIMITE.value;
+    let descripcion = DESCRIPCION.value;
+    if (fecha != '' && descripcion != '') {
+        let tarea = {
+            fecha, // dato fecha
+            descripcion // descripcion
+        };
 
-const ACCESS_TOKEN = "ya29.a0Aa4xrXOKf__5yl90I7pB0mggGg2jbS5HnwAimYYTWc3dK77Ai-2Ya4UDFcbnLtj8vUbZzdYdsIlJwrRVkrvGFSBxRKWt5APXALI-nEE-XGrM5RJJHkGh5RyR3lFBZ1mXRwaPU6nD9zwP1tR9oevyK3JQGvRi-waCgYKAeESARMSFQEjDvL9x5rE_UtHqCzhx07v5bdAWA0165";
-
-listaTareas();
-
-function listaTareas() {
-
-    fetch(
-        //Obtenemos los datos de la planilla, de la hojaTareas, columnas A y B desde la segunda fila
-        `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/tareas!A2:C`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${ACCESS_TOKEN}`
-            },
+        if (localStorage.getItem('tareas') === null) {
+            let tareas = [];
+            tareas.push(tarea);
+            localStorage.setItem('tareas', JSON.stringify(tareas));
+        } else {
+            let tareas = JSON.parse(localStorage.getItem('tareas'));
+            tareas.push(tarea);
+            localStorage.setItem('tareas', JSON.stringify(tareas));
         }
-    ).then(function (response) {
-        //esperamos el json del response para poder utilizarlo
-        response.json().then(function (data) {
-            const values = data.values;
 
-            //Obtenemos el elemento del dom
-
-            for (let i = 0; i < values.length; i++) {
-                //Div que va a contener los datos de la tarea
-                const TAREA = document.createElement('div');
-                TAREA.className = 'tarea';
-
-                //Fecha de la tarea
-                const FECHA = document.createElement('span');
-                FECHA.innerHTML = values[i][0];
-
-                //Descripcion de la tarea
-                const TAREA_DESCRIPCION = document.createElement('p');
-                TAREA_DESCRIPCION.innerHTML = values[i][1];
-
-                //Boton eliminar
-                const BOTON_ELIMINAR = document.createElement('button');
-                BOTON_ELIMINAR.className = 'eliminar';
-                BOTON_ELIMINAR.innerText = 'X';
-
-                //Agregamos todos los elementos al div de producto
-                TAREA.appendChild(FECHA);
-                TAREA.appendChild(TAREA_DESCRIPCION);
-                TAREA.appendChild(BOTON_ELIMINAR);
-
-                //Agregamos la tarea a la lista
-                TAREAS.appendChild(TAREA);
-
-                BOTON_ELIMINAR.addEventListener('click', () => {
-
-                });
-            }
-        })
-    });
-}
-
-function onRegistrarTareas() {
-    //Obtenemos los datos del formulario
-    //Creamos el JSOn que espera nuestra API
-    let data = {};
-    let values = [];
-    let fila = [FECHA_LIMITE.value, DESCRIPCION.value];
-
-    values.push(fila);
-
-    //Verificar que coincida con el nombre de la hoja de nuestro sheet
-    data.range = "tareas";
-    data.majorDimension = "ROWS";
-    data.values = values;
-
-    //Invocamos al método POST de la API
-    fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/tareas:append?valueInputOption=USER_ENTERED`,
-        {
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${ACCESS_TOKEN}`,
-            },
-            body: JSON.stringify(data)
-        }
-    ).then(function (response) {
-        TAREAS.innerHTML = '';
-        listaTareas();
-        response.json().then(function (data) {
-
-        });
-    });
-
-    //Limpiamos los campos del formulario para permitir cargar una nueva tarea
-    FECHA_LIMITE.value = '';
-    DESCRIPCION.value = '';
-
-}
-
-AGREGAR.addEventListener('click', () => {
-
-    if (FECHA_LIMITE.value !== '' && DESCRIPCION.value !== '') {
-        // Escribir la hoja
-       
-        onRegistrarTareas();
-       
+        escribirTareas();
+        document.getElementById('seccion-agregar').reset();
+        e.preventDefault();
     } else {
-        // Mensaje de error
+        // Si hay error
         ERROR.style.display = 'block';
         setTimeout(() => {
             ERROR.style.display = 'none';
         }, 5000);
+        e.preventDefault();
     }
-});
+}
+
+function eliminarTarea(descripcion) {
+
+    let tareas = JSON.parse(localStorage.getItem('tareas'));
+    for (let i = 0; i < tareas.length; i++) {
+        if (tareas[i].descripcion == descripcion) {
+            tareas.splice(i, 1);
+        }
+    }
+
+    localStorage.setItem('tareas', JSON.stringify(tareas));
+    escribirTareas();
+
+
+}
+
+function escribirTareas() {
+    let tareas = JSON.parse(localStorage.getItem('tareas'));
+    let vistaTareas = document.getElementById('tareas');
+    vistaTareas.innerHTML = '';
+    for (let i = 0; i < tareas.length; i++) {
+        let fecha = tareas[i].fecha;
+        let descripcion = tareas[i].descripcion;
+
+        vistaTareas.innerHTML += `
+        <div class='tarea'>
+            <span>${fecha}</span>
+            <p>${descripcion}</p>
+            <button onclick="eliminarTarea('${descripcion}')" class='eliminar'>X</button>
+        </div>`;
+    }
+}
+
+escribirTareas();
